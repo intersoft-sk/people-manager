@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
+    <kbase name="kbase-business" packages="rules.business">
+        <ksession name="business-rules" type="stateful" clockType="realtime" default="true"/>
+    </kbase>
+    <kbase name="kbase-pm" packages="rules.pm">
+        <ksession name="pm-rules" type="stateful" clockType="realtime"/>
+    </kbase>
+</kmodule>

@@ -1,0 +1,78 @@
+
+package eu.ebbitsproject.peoplemanager.RuleEngineWS
+
+import eu.ebbitsproject.peoplemanager.PersonDynamicStore;
+import eu.ebbitsproject.peoplemanager.model.Event;
+import eu.ebbitsproject.peoplemanager.model.Person;
+import eu.ebbitsproject.peoplemanager.utils.HttpUtils;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+
+declare Event
+    @role(event)
+end
+
+// -------------------------------------------------------
+// Vibration application rules
+// -------------------------------------------------------
+
+rule "Event: VIBRATION_ERROR"
+    when
+        $e: Event(type == "VIBRATION_ERROR")
+    then
+        String responsibleId = (String) $e.getProps().get("responsible");
+        PersonDynamicStore.getInstance().getPersonByErpId(responsibleId).getProps().put("available", false);
+        System.out.println("{{{{{{{{{{{" + PersonDynamicStore.getInstance().getPersonByErpId(responsibleId).getProps().get("available"));
+end
+
+rule "Event: VIBRATION_ERROR_RESOLVED"
+    when
+        $e: Event(type == "VIBRATION_ERROR_RESOLVED")
+    then
+        String responsibleId = (String) $e.getProps().get("responsible");
+        PersonDynamicStore.getInstance().getPersonByErpId(responsibleId).getProps().put("available", true);
+        System.out.println("{{{{{{{{{{{" + PersonDynamicStore.getInstance().getPersonByErpId(responsibleId).getProps().get("available"));
+end
+
+// -------------------------------------------------------
+// Chop and Weigh events handling rules
+// -------------------------------------------------------
+
+rule "Event: CaW Occured"
+    when
+        $e : Event(type == "event:caw")
+    then
+        System.out.println($e);
+end
+
+rule "Event: CaW Occured more than 3 times"
+    when
+        $e: Event(type == "event:caw")
+        $events: ArrayList(size > 3) from collect(Event(type == $e.getType(), props.get("person") == $e.getProps().get("person")))
+    then
+        ((Person) $e.getProps().get("person")).getProps().put("available", false);
+        Map<String, Object> props = new HashMap<>();
+        props.put("person", $e.getProps().get("person"));
+        insert(new Event("event:makeavailable", props));
+        System.out.println("CaW event occured more than 3 times");
+        List<Event> eventsCopy = new ArrayList<>($events);
+        for (int i = 0; i < eventsCopy.size(); i++) {
+            Event delEvent = (Event) $events.get(i);
+            System.out.println("Removing event " + i);
+            retract(delEvent);
+        }
+end
+
+rule "Event: Dummy event occured, timer test after 10 seconds."
+    duration(10s)
+    when
+        $e : Event(type == "event:makeavailable")        
+    then
+        ((Person) $e.getProps().get("person")).getProps().put("available", true);
+        System.out.println($e);
+        System.out.println("Making person available after 10 seconds.");
+        retract($e);
+end

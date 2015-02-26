@@ -1,0 +1,4 @@
+- Id Person 1...3
+- isPersonAvailableByID
+- pri accept repair, nastavim stav availability na FALSE
+- pri confirm repair -> stav avail. true

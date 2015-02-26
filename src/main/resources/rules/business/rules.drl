@@ -1,0 +1,88 @@
+
+package eu.ebbitsproject.peoplemanager.RuleEngineWS
+
+import eu.ebbitsproject.peoplemanager.PersonDynamicStore;
+import eu.ebbitsproject.peoplemanager.model.Event;
+import eu.ebbitsproject.peoplemanager.model.Person;
+import eu.ebbitsproject.peoplemanager.utils.HttpUtils;
+import eu.ebbitsproject.peoplemanager.utils.OMProxy;
+import eu.ebbitsproject.peoplemanager.utils.MQTTProxy;
+
+import java.util.List;
+import java.util.HashSet;
+import java.util.Arrays;
+
+declare Event
+	@role(event)
+end
+
+rule "Event: Vibration Occured"
+    when
+        $e : Event(type == "vibration")
+    then
+        System.out.println($e);
+        //Person p = PersonDynamicStore.getInstance().getPersonByErpId("1001-0110-0210-0310-0410-059D");
+        //System.out.println(p);
+        //MQTTProxy.getInstance().sendMessage("sample");
+        // ----------------------------------
+        //List<Person> persons = PersonDynamicStore.getInstance().getPersonsByLocations(new HashSet<String>(Arrays.asList("building1")));
+        //System.out.println(persons);
+        //System.out.println(">>>>>>>>" + OMProxy.getLocations("sensor1").toString());
+        //System.out.println("Sending MQTT message");
+        //MQTTProxy.getInstance().sendMessage("say a joke...");
+        //System.out.println("MQTT message send...");        
+
+end
+
+//rule "Event: New Error Occured"
+//    when
+//        $e : Event(type == "error", getProperties().get("checked") == null)
+//    then
+//        System.out.println($e);
+//        String location = HttpUtils.findLocation($e.getProperties().get("objectId"));
+//        String personId = HttpUtils.findPerson($e.getProperties().get("errorType"), location);
+//	System.out.println("### PersonID: " + personId);
+//        modify ($e) { getProperties().put("location", location) }
+//        modify ($e) { getProperties().put("personId", personId) }   
+//        modify ($e) { getProperties().put("checked", "yes") }
+//end
+
+//rule "Event: Checked, Person Found"
+//    when
+//        $e: Event(type == "error", getProperties().get("personId") != null)
+//    then
+//        HttpUtils.alert($e.getProperties().get("errorType"),
+//                        $e.getProperties().get("objectId"),
+//                        $e.getProperties().get("personId"),
+//			$e.getId());
+//end
+
+//rule "Event: Checked, Person NOT Found"
+//    when
+//        $e: Event(type == "error", getProperties().get("personId") == null)
+//    then
+//        HttpUtils.alert($e.getProperties().get("errorType"),
+//                        $e.getProperties().get("objectId"));
+//end
+
+//rule "Event: Accept Repair"
+//    when
+//        $e: Event(type == "accept-repair")
+//    then
+//        System.out.println($e);
+//	PersonDynamicStore.getInstance().getPersonById($e.getProperties().get("personId")).getProperties().put("available", false);
+//	String acceptedRepairs = (String) PersonDynamicStore.getInstance().getPersonById($e.getProperties().get("personId")).getProperties().get("acceptedRepairs");
+//	PersonDynamicStore.getInstance().getPersonById($e.getProperties().get("personId")).getProperties().put("acceptedRepairs", acceptedRepairs + "," +$e.getProperties().get("eventId"));
+//        System.out.println("Availability of person " + $e.getProperties().get("personId") + " set to false");
+//end
+
+//rule "Event: Confirm Repair"
+//    when
+//        $e: Event(type == "confirm-repair")
+//    then
+//        System.out.println($e);
+//	PersonDynamicStore.getInstance().getPersonById($e.getProperties().get("personId")).getProperties().put("available", true);
+//	String confirmedRepairs = (String) PersonDynamicStore.getInstance().getPersonById($e.getProperties().get("personId")).getProperties().get("confirmedRepairs");
+//	PersonDynamicStore.getInstance().getPersonById($e.getProperties().get("personId")).getProperties().put("confirmedRepairs", confirmedRepairs + "," +$e.getProperties().get("eventId"));
+//        System.out.println("Availability of person " + $e.getProperties().get("personId") + " set to true");
+//end
